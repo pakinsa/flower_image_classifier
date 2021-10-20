@@ -24,6 +24,7 @@ import numpy as np
 import seaborn as sns
 import argparse
 import torch
+from workspace_utils import active_session
 
 from select_input_types import args_parser
 from transformer import transformer
@@ -35,37 +36,39 @@ from save_checkpoint import save_checkpoint
 
 
 def main():
-
-    start_time = time
+    
+    with active_session():
+    
+        start_time = time()
    
 
-    data_dir = 'flowers'
-    train_dir = data_dir + '/train'
-    valid_dir = data_dir + '/valid'
-    test_dir = data_dir + '/test'
+        data_dir = 'flowers'
+        train_dir = data_dir + '/train'
+        valid_dir = data_dir + '/valid'
+        test_dir = data_dir + '/test'
     
         
-    args = args_parser()
-    print(args) 
+        args = args_parser()
+        print(args) 
     
     
-    dataloaders_tr, dataloaders_va, dataloaders_te = transformer(train_dir, test_dir, valid_dir)
+        dataloaders_tr, dataloaders_va, dataloaders_te = transformer(train_dir, test_dir, valid_dir)
 
     
-    print("...model loading....")
-    trained_model = train_model(dataloaders_tr, dataloaders_va, \
-                                args.hidden_units1, args.hidden_units2, args.epochs, args.arch, args.lr, args.gpu)
+        print("...model loading....")
+        trained_model = train_model(dataloaders_tr, dataloaders_va, \
+                                    args.hidden_units1, args.hidden_units2, args.epochs, args.arch, args.lr, args.dev)
     
     
-    save_checkpoint(trained_model, image_datasets_tr, args.save_dir)
-    print('Checkpoint Saved!')
+        save_checkpoint(trained_model, image_datasets_tr, args.save_dir)
+        print('Checkpoint Saved!')
     
     
-    end_time = time
+        end_time = time()
 
-    tot_time = end_time - start_time  #calculate difference between end time and start time
+        tot_time = end_time - start_time  #calculate difference between end time and start time
     
-    print('Total time taken is:', tot_time)
+        print('Total time taken is:', tot_time)
     
     
 # Call to main function to run the program
@@ -73,11 +76,8 @@ if __name__ == "__main__":
     main()
 
         
-    print("\n** Total Elapsed Runtime:",
-          str(int((tot_time/3600)))+":"+str(int((tot_time%3600)/60))+":"
-          +str(int((tot_time%3600)%60)) )
-    
-    print("redefine your hyperparameters by changing the values of this command:"\
+        
+    print("you can redefine your hyperparameters by changing the values of this command:"\
           "python train.py  --data_dir flowers  -- epochs 10  --gpu True  --arch vgg16"\
           "--hidden_units1 5024  --hidden_units2 1024  --learning_rate 0.0001")
     
